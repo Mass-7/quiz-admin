@@ -98,17 +98,11 @@
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-            animation: slideUp 0.5s ease;
         }
 
         .stat-card.accent-1 {
             border-color: var(--accent-1);
             background: rgba(78, 205, 196, 0.1);
-        }
-
-        .stat-card.accent-2 {
-            border-color: var(--accent-2);
-            background: rgba(255, 230, 109, 0.1);
         }
 
         .stat-number {
@@ -122,27 +116,11 @@
             color: var(--accent-1);
         }
 
-        .stat-card.accent-2 .stat-number {
-            color: var(--accent-2);
-        }
-
         .stat-label {
             font-size: 0.9em;
             color: var(--text-secondary);
             text-transform: uppercase;
             font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .main-grid {
@@ -165,7 +143,6 @@
             color: var(--accent-1);
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .form-group {
@@ -179,13 +156,11 @@
             color: var(--accent-2);
             text-transform: uppercase;
             font-size: 0.85em;
-            letter-spacing: 0.5px;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"],
-        input[type="number"],
         textarea,
         select {
             width: 100%;
@@ -196,13 +171,11 @@
             color: var(--text-light);
             font-size: 1em;
             font-family: inherit;
-            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="password"]:focus,
-        input[type="number"]:focus,
         textarea:focus,
         select:focus {
             outline: none;
@@ -245,30 +218,21 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
-            text-decoration: none;
             display: inline-block;
         }
 
         .btn-primary {
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
         }
 
         .btn-secondary {
             background: linear-gradient(45deg, var(--accent-1), var(--accent-3));
             color: var(--darker-bg);
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
         }
 
         .btn-danger {
@@ -304,10 +268,6 @@
             border-bottom: 1px solid rgba(255, 107, 157, 0.1);
         }
 
-        .questions-table tr:hover {
-            background: rgba(78, 205, 196, 0.05);
-        }
-
         .category-badge {
             display: inline-block;
             padding: 5px 12px;
@@ -324,40 +284,38 @@
         .category-jeux { background: rgba(78, 205, 196, 0.3); color: var(--accent-1); }
         .category-musique { background: rgba(149, 225, 211, 0.3); color: var(--accent-3); }
 
-        .difficulty-easy { color: #4ECDC4; }
-        .difficulty-medium { color: #FFE66D; }
-        .difficulty-hard { color: #FF6B9D; }
-
-        .tabs {
+        .login-container {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 50px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .success-message {
+            background: rgba(78, 205, 196, 0.2);
+            border-left: 4px solid var(--accent-1);
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            border-bottom: 2px solid rgba(78, 205, 196, 0.2);
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-weight: bold;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-
-        .tab-btn.active {
             color: var(--accent-1);
-            border-bottom-color: var(--accent-1);
-        }
-
-        .tab-content {
             display: none;
         }
 
-        .tab-content.active {
+        .success-message.show {
             display: block;
         }
 
@@ -395,48 +353,6 @@
             font-weight: bold;
             color: var(--text-secondary);
             cursor: pointer;
-        }
-
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .login-box {
-            background: var(--card-bg);
-            border: 2px solid var(--primary);
-            border-radius: 16px;
-            padding: 50px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .login-box h1 {
-            font-size: 2.5em;
-            margin-bottom: 30px;
-        }
-
-        .success-message {
-            background: rgba(78, 205, 196, 0.2);
-            border-left: 4px solid var(--accent-1);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: var(--accent-1);
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        .category-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
         }
 
         .difficulty-options {
@@ -487,11 +403,11 @@
                 </label>
             </div>
 
-            <button class="btn btn-primary" style="width: 100%; font-size: 1.1em; padding: 15px;" onclick="handleAuth()">
+            <button class="btn btn-primary" style="width: 100%; font-size: 1.1em; padding: 15px;" onclick="auth()">
                 Se connecter
             </button>
 
-            <p id="firebaseStatus" style="margin-top: 20px; font-size: 0.9em; color: #FFE66D; text-align: center;">
+            <p id="status" style="margin-top: 20px; font-size: 0.9em; color: #FFE66D; text-align: center;">
                 ⏳ Chargement...
             </p>
         </div>
@@ -512,10 +428,6 @@
                 <div class="stat-card">
                     <div class="stat-number" id="totalQuestions">0</div>
                     <div class="stat-label">Questions</div>
-                </div>
-                <div class="stat-card accent-1">
-                    <div class="stat-number" id="activeUsers">0</div>
-                    <div class="stat-label">Catégories</div>
                 </div>
             </div>
 
@@ -570,19 +482,8 @@
                 </div>
 
                 <div class="section">
-                    <h2>📊 Statistiques</h2>
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab('stats')">Catégories</button>
-                        <button class="tab-btn" onclick="switchTab('export')">Export</button>
-                    </div>
-
-                    <div id="stats" class="tab-content active">
-                        <div class="category-stats" id="categoryStats"></div>
-                    </div>
-
-                    <div id="export" class="tab-content">
-                        <button class="btn btn-secondary" onclick="exportQuestions()" style="width: 100%; margin-top: 10px;">📥 Exporter JSON</button>
-                    </div>
+                    <h2>📊 Actions</h2>
+                    <button class="btn btn-secondary" onclick="exportQuestions()" style="width: 100%; margin-top: 10px;">📥 Exporter JSON</button>
                 </div>
             </div>
 
@@ -593,12 +494,11 @@
                         <tr>
                             <th style="width: 60%;">Question</th>
                             <th>Catégorie</th>
-                            <th>Difficulté</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="questionsBody">
-                        <tr><td colspan="4" style="text-align: center;">Aucune question...</td></tr>
+                        <tr><td colspan="3" style="text-align: center;">Aucune question...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -649,18 +549,13 @@
     </div>
 
     <script>
-        // Supabase Config
         const SUPABASE_URL = 'https://jksnsxxedyzewxylusxy.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprc25zeHhlZHl6ZXd4eWx1c3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwODU5MjYsImV4cCI6MjA5MTY2MTkyNn0.ujKCZQ70BKiSEwkOPMvktUsKhGC87-WVi0xFWYotG6E';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprc25zeHhlZHl6ZXd4eWx1c3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwODU5MjYsImV4cCI6MjA5MTY2MTkyNn0.ujKCZQ70BKiSEwkOPMvktUsKhGC87-WVi0xFWYotG6E';
 
-        const { createClient } = window.supabase;
-        let supabase;
-        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        document.getElementById('status').innerHTML = '✅ Supabase prêt!';
+        document.getElementById('status').style.color = '#4ECDC4';
 
-        document.getElementById('firebaseStatus').innerHTML = '✅ Supabase prêt!';
-        document.getElementById('firebaseStatus').style.color = '#4ECDC4';
-
-        let currentUser = null;
         let currentEditId = null;
         let allQuestions = [];
 
@@ -678,7 +573,7 @@
             }
         }
 
-        async function handleAuth() {
+        async function auth() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const isSignup = document.getElementById('isSignup').checked;
@@ -690,14 +585,10 @@
 
             try {
                 if (isSignup) {
-                    const { data, error } = await supabase.auth.signUp({ email, password });
-                    if (error) throw error;
+                    await supabase.auth.signUp({ email, password });
                 } else {
-                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
+                    await supabase.auth.signInWithPassword({ email, password });
                 }
-                const { data: { user } } = await supabase.auth.getUser();
-                currentUser = user;
                 showMainApp();
             } catch (error) {
                 alert('Erreur: ' + error.message);
@@ -714,14 +605,13 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             loadQuestions();
-            loadStats();
         }
 
         async function addQuestion() {
             const text = document.getElementById('questionText').value;
             const category = document.getElementById('questionCategory').value;
-            const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value;
-            const correctAnswer = parseInt(document.querySelector('input[name="correctAnswer"]:checked')?.value);
+            const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+            const correctAnswer = parseInt(document.querySelector('input[name="correctAnswer"]:checked').value);
             const answers = [
                 document.getElementById('answer0').value,
                 document.getElementById('answer1').value,
@@ -735,16 +625,12 @@
             }
 
             try {
-                const { error } = await supabase.from('questions').insert({
-                    text, category, difficulty, answers, correct_answer: correctAnswer
-                });
-                if (error) throw error;
-
+                await supabase.from('questions').insert({ text, category, difficulty, answers, correct_answer: correctAnswer });
                 document.getElementById('questionText').value = '';
                 ['answer0','answer1','answer2','answer3'].forEach(id => document.getElementById(id).value = '');
-                showSuccess('✓ Ajoutée!');
+                document.getElementById('successMessage').classList.add('show');
+                setTimeout(() => document.getElementById('successMessage').classList.remove('show'), 3000);
                 loadQuestions();
-                loadStats();
             } catch (error) {
                 alert('Erreur: ' + error.message);
             }
@@ -771,7 +657,7 @@
         async function saveEditQuestion() {
             const text = document.getElementById('editQuestionText').value;
             const category = document.getElementById('editCategory').value;
-            const correctAnswer = parseInt(document.querySelector('input[name="editCorrectAnswer"]:checked')?.value);
+            const correctAnswer = parseInt(document.querySelector('input[name="editCorrectAnswer"]:checked').value);
             const answers = [
                 document.getElementById('editAnswer0').value,
                 document.getElementById('editAnswer1').value,
@@ -780,10 +666,7 @@
             ];
 
             try {
-                const { error } = await supabase.from('questions').update({
-                    text, category, answers, correct_answer: correctAnswer
-                }).eq('id', currentEditId);
-                if (error) throw error;
+                await supabase.from('questions').update({ text, category, answers, correct_answer: correctAnswer }).eq('id', currentEditId);
                 closeEditModal();
                 loadQuestions();
             } catch (error) {
@@ -794,8 +677,7 @@
         async function deleteQuestion() {
             if (!confirm('Supprimer?')) return;
             try {
-                const { error } = await supabase.from('questions').delete().eq('id', currentEditId);
-                if (error) throw error;
+                await supabase.from('questions').delete().eq('id', currentEditId);
                 closeEditModal();
                 loadQuestions();
             } catch (error) {
@@ -805,57 +687,25 @@
 
         async function loadQuestions() {
             try {
-                const { data, error } = await supabase.from('questions').select('*');
-                if (error) throw error;
-
+                const { data } = await supabase.from('questions').select('*');
                 allQuestions = data || [];
                 const tbody = document.getElementById('questionsBody');
                 tbody.innerHTML = '';
 
                 allQuestions.forEach(q => {
                     const catClass = `category-${q.category.toLowerCase().replace(/\s+/g, '')}`;
-                    const diffEmoji = q.difficulty === 'easy' ? '🟢' : q.difficulty === 'medium' ? '🟡' : '🔴';
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${q.text}</td>
                         <td><span class="category-badge ${catClass}">${q.category}</span></td>
-                        <td>${diffEmoji} ${q.difficulty}</td>
                         <td><button class="btn btn-secondary btn-small" onclick="openEditModal('${q.id}')">✏️</button></td>
                     `;
                     tbody.appendChild(row);
                 });
 
-                if (allQuestions.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Aucune question</td></tr>';
-                }
+                document.getElementById('totalQuestions').textContent = allQuestions.length;
             } catch (error) {
-                console.error('Error loading questions:', error);
-            }
-        }
-
-        async function loadStats() {
-            try {
-                const { data, error } = await supabase.from('questions').select('*');
-                if (error) throw error;
-
-                const questions = data || [];
-                document.getElementById('totalQuestions').textContent = questions.length;
-                
-                const stats = {};
-                questions.forEach(q => {
-                    stats[q.category] = (stats[q.category] || 0) + 1;
-                });
-
-                const statsDiv = document.getElementById('categoryStats');
-                statsDiv.innerHTML = '';
-                Object.entries(stats).forEach(([cat, count]) => {
-                    const card = document.createElement('div');
-                    card.className = 'stat-card accent-1';
-                    card.innerHTML = `<div class="stat-number">${count}</div><div class="stat-label">${cat}</div>`;
-                    statsDiv.appendChild(card);
-                });
-            } catch (error) {
-                console.error('Error loading stats:', error);
+                console.error('Error:', error);
             }
         }
 
@@ -869,24 +719,9 @@
             a.click();
         }
 
-        function showSuccess(msg) {
-            const el = document.getElementById('successMessage');
-            el.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3000);
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tab).classList.add('active');
-        }
-
         createStars();
-        supabase.auth.onAuthStateChange(async (event, session) => {
+        supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
-                currentUser = session.user;
                 showMainApp();
             }
         });
