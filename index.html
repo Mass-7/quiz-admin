@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎮 Quiz-a-Day Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -491,7 +492,7 @@
             </button>
 
             <p id="firebaseStatus" style="margin-top: 20px; font-size: 0.9em; color: #FFE66D; text-align: center;">
-                ⏳ Chargement Firebase...
+                ⏳ Chargement...
             </p>
         </div>
     </div>
@@ -647,26 +648,15 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
-
     <script>
-        const firebaseConfig = {
-  apiKey: "AIzaSyDR7-ejjHR34AB59j6U0RW8OcpEQd-hfkY",
-  authDomain: "quiz-a-day.firebaseapp.com",
-  projectId: "quiz-a-day",
-  storageBucket: "quiz-a-day.firebasestorage.app",
-  messagingSenderId: "43179997556",
-  appId: "1:43179997556:web:8941316211be6259b8d421",
-  measurementId: "G-3G82WC3QLM"
-};
+        // Supabase Config
+        const SUPABASE_URL = 'https://jksnsxxedyzewxylusxy.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprc25zeHhlZHl6ZXd4eWx1c3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwODU5MjYsImV4cCI6MjA5MTY2MTkyNn0.ujKCZQ70BKiSEwkOPMvktUsKhGC87-WVi0xFWYotG6E';
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        document.getElementById('firebaseStatus').innerHTML = '✅ Firebase prêt!';
+        document.getElementById('firebaseStatus').innerHTML = '✅ Supabase prêt!';
         document.getElementById('firebaseStatus').style.color = '#4ECDC4';
 
         let currentUser = null;
@@ -687,7 +677,7 @@
             }
         }
 
-        function handleAuth() {
+        async function handleAuth() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const isSignup = document.getElementById('isSignup').checked;
@@ -697,22 +687,26 @@
                 return;
             }
 
-            if (isSignup) {
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then(() => { currentUser = auth.currentUser; showMainApp(); })
-                    .catch(e => alert('Erreur: ' + e.message));
-            } else {
-                auth.signInWithEmailAndPassword(email, password)
-                    .then(() => { currentUser = auth.currentUser; showMainApp(); })
-                    .catch(e => alert('Erreur: ' + e.message));
+            try {
+                if (isSignup) {
+                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    if (error) throw error;
+                } else {
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                }
+                const { data: { user } } = await supabase.auth.getUser();
+                currentUser = user;
+                showMainApp();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
             }
         }
 
-        function logout() {
-            auth.signOut().then(() => {
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('mainApp').style.display = 'none';
-            });
+        async function logout() {
+            await supabase.auth.signOut();
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
         }
 
         function showMainApp() {
@@ -722,7 +716,7 @@
             loadStats();
         }
 
-        function addQuestion() {
+        async function addQuestion() {
             const text = document.getElementById('questionText').value;
             const category = document.getElementById('questionCategory').value;
             const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value;
@@ -739,15 +733,20 @@
                 return;
             }
 
-            db.ref('questions').push({text, category, difficulty, answers, correctAnswer, createdAt: new Date().toISOString()})
-                .then(() => {
-                    document.getElementById('questionText').value = '';
-                    ['answer0','answer1','answer2','answer3'].forEach(id => document.getElementById(id).value = '');
-                    document.querySelector('input[name="difficulty"]').checked = false;
-                    showSuccess('✓ Ajoutée!');
-                    loadQuestions();
-                    loadStats();
+            try {
+                const { error } = await supabase.from('questions').insert({
+                    text, category, difficulty, answers, correct_answer: correctAnswer
                 });
+                if (error) throw error;
+
+                document.getElementById('questionText').value = '';
+                ['answer0','answer1','answer2','answer3'].forEach(id => document.getElementById(id).value = '');
+                showSuccess('✓ Ajoutée!');
+                loadQuestions();
+                loadStats();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
         }
 
         function openEditModal(id) {
@@ -760,7 +759,7 @@
             document.getElementById('editAnswer1').value = q.answers[1];
             document.getElementById('editAnswer2').value = q.answers[2];
             document.getElementById('editAnswer3').value = q.answers[3];
-            document.querySelector(`input[name="editCorrectAnswer"][value="${q.correctAnswer}"]`).checked = true;
+            document.querySelector(`input[name="editCorrectAnswer"][value="${q.correct_answer}"]`).checked = true;
             document.getElementById('editModal').classList.add('active');
         }
 
@@ -768,7 +767,7 @@
             document.getElementById('editModal').classList.remove('active');
         }
 
-        function saveEditQuestion() {
+        async function saveEditQuestion() {
             const text = document.getElementById('editQuestionText').value;
             const category = document.getElementById('editCategory').value;
             const correctAnswer = parseInt(document.querySelector('input[name="editCorrectAnswer"]:checked')?.value);
@@ -779,27 +778,40 @@
                 document.getElementById('editAnswer3').value
             ];
 
-            db.ref(`questions/${currentEditId}`).update({text, category, answers, correctAnswer})
-                .then(() => { closeEditModal(); loadQuestions(); });
-        }
-
-        function deleteQuestion() {
-            if (!confirm('Supprimer?')) return;
-            db.ref(`questions/${currentEditId}`).remove().then(() => {
+            try {
+                const { error } = await supabase.from('questions').update({
+                    text, category, answers, correct_answer: correctAnswer
+                }).eq('id', currentEditId);
+                if (error) throw error;
                 closeEditModal();
                 loadQuestions();
-            });
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
         }
 
-        function loadQuestions() {
-            db.ref('questions').on('value', snapshot => {
-                allQuestions = [];
+        async function deleteQuestion() {
+            if (!confirm('Supprimer?')) return;
+            try {
+                const { error } = await supabase.from('questions').delete().eq('id', currentEditId);
+                if (error) throw error;
+                closeEditModal();
+                loadQuestions();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        async function loadQuestions() {
+            try {
+                const { data, error } = await supabase.from('questions').select('*');
+                if (error) throw error;
+
+                allQuestions = data || [];
                 const tbody = document.getElementById('questionsBody');
                 tbody.innerHTML = '';
 
-                snapshot.forEach(child => {
-                    const q = child.val();
-                    allQuestions.push({id: child.key, ...q});
+                allQuestions.forEach(q => {
                     const catClass = `category-${q.category.toLowerCase().replace(/\s+/g, '')}`;
                     const diffEmoji = q.difficulty === 'easy' ? '🟢' : q.difficulty === 'medium' ? '🟡' : '🔴';
                     const row = document.createElement('tr');
@@ -807,7 +819,7 @@
                         <td>${q.text}</td>
                         <td><span class="category-badge ${catClass}">${q.category}</span></td>
                         <td>${diffEmoji} ${q.difficulty}</td>
-                        <td><button class="btn btn-secondary btn-small" onclick="openEditModal('${child.key}')">✏️</button></td>
+                        <td><button class="btn btn-secondary btn-small" onclick="openEditModal('${q.id}')">✏️</button></td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -815,16 +827,22 @@
                 if (allQuestions.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Aucune question</td></tr>';
                 }
-            });
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
         }
 
-        function loadStats() {
-            db.ref('questions').once('value', snapshot => {
-                document.getElementById('totalQuestions').textContent = snapshot.numChildren();
+        async function loadStats() {
+            try {
+                const { data, error } = await supabase.from('questions').select('*');
+                if (error) throw error;
+
+                const questions = data || [];
+                document.getElementById('totalQuestions').textContent = questions.length;
+                
                 const stats = {};
-                snapshot.forEach(child => {
-                    const cat = child.val().category;
-                    stats[cat] = (stats[cat] || 0) + 1;
+                questions.forEach(q => {
+                    stats[q.category] = (stats[q.category] || 0) + 1;
                 });
 
                 const statsDiv = document.getElementById('categoryStats');
@@ -835,12 +853,14 @@
                     card.innerHTML = `<div class="stat-number">${count}</div><div class="stat-label">${cat}</div>`;
                     statsDiv.appendChild(card);
                 });
-            });
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
         }
 
         function exportQuestions() {
-            const data = {exported: new Date().toISOString(), questions: allQuestions};
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const data = { exported: new Date().toISOString(), questions: allQuestions };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -863,9 +883,9 @@
         }
 
         createStars();
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (session) {
+                currentUser = session.user;
                 showMainApp();
             }
         });
