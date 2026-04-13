@@ -65,7 +65,6 @@
         header {
             text-align: center;
             margin-bottom: 40px;
-            position: relative;
         }
 
         h1 {
@@ -75,7 +74,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
             margin-bottom: 10px;
             letter-spacing: 2px;
         }
@@ -158,7 +156,6 @@
             border: 2px solid rgba(255, 107, 157, 0.3);
             border-radius: 16px;
             padding: 30px;
-            backdrop-filter: blur(10px);
         }
 
         .section h2 {
@@ -276,12 +273,6 @@
         .btn-danger {
             background: linear-gradient(45deg, var(--accent-4), #FF6B6B);
             color: white;
-            box-shadow: 0 4px 15px rgba(243, 129, 129, 0.3);
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(243, 129, 129, 0.5);
         }
 
         .btn-small {
@@ -367,12 +358,6 @@
 
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .modal {
@@ -383,7 +368,6 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -410,11 +394,6 @@
             font-weight: bold;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close-modal:hover {
-            color: var(--primary);
         }
 
         .login-container {
@@ -431,22 +410,11 @@
             padding: 50px;
             width: 100%;
             max-width: 400px;
-            backdrop-filter: blur(10px);
         }
 
         .login-box h1 {
             font-size: 2.5em;
             margin-bottom: 30px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .export-btn {
-            margin-top: 20px;
         }
 
         .success-message {
@@ -461,18 +429,6 @@
 
         .success-message.show {
             display: block;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
         }
 
         .category-stats {
@@ -499,45 +455,16 @@
             .main-grid {
                 grid-template-columns: 1fr;
             }
-
             h1 {
                 font-size: 2.5em;
             }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .questions-table {
-                font-size: 0.9em;
-            }
-
-            .questions-table td, .questions-table th {
-                padding: 10px;
-            }
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(78, 205, 196, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--accent-1);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="stars-bg" id="starsBg"></div>
 
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN -->
     <div id="loginScreen" class="login-container">
         <div class="login-box">
             <h1>🎮 Quiz-a-Day</h1>
@@ -555,7 +482,7 @@
 
             <div class="form-group">
                 <label style="color: var(--text-secondary); font-size: 0.8em;">
-                    <input type="checkbox" id="isSignup"> Créer un compte (première visite)
+                    <input type="checkbox" id="isSignup"> Créer un compte
                 </label>
             </div>
 
@@ -564,17 +491,17 @@
             </button>
 
             <p id="firebaseStatus" style="margin-top: 20px; font-size: 0.9em; color: #FFE66D; text-align: center;">
-                ⏳ Vérification Firebase...
+                ⏳ Chargement Firebase...
             </p>
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- APP -->
     <div id="mainApp" style="display: none;">
         <div class="container">
             <header>
                 <h1>🎮 Quiz-a-Day Admin</h1>
-                <p class="subtitle">Gère tes questions, contrôle le jeu</p>
+                <p class="subtitle">Gère tes questions</p>
                 <button class="btn btn-secondary btn-small" onclick="logout()" style="margin-top: 15px;">
                     Logout
                 </button>
@@ -583,27 +510,22 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number" id="totalQuestions">0</div>
-                    <div class="stat-label">Questions totales</div>
+                    <div class="stat-label">Questions</div>
                 </div>
                 <div class="stat-card accent-1">
-                    <div class="stat-number" id="todayQuestions">0</div>
-                    <div class="stat-label">Questions aujourd'hui</div>
-                </div>
-                <div class="stat-card accent-2">
                     <div class="stat-number" id="activeUsers">0</div>
-                    <div class="stat-label">Joueurs actifs</div>
+                    <div class="stat-label">Catégories</div>
                 </div>
             </div>
 
             <div class="main-grid">
-                <!-- ADD QUESTION SECTION -->
                 <div class="section">
                     <h2>➕ Ajouter Question</h2>
-                    <div class="success-message" id="successMessage">✓ Question ajoutée avec succès!</div>
+                    <div class="success-message" id="successMessage">✓ Question ajoutée!</div>
 
                     <div class="form-group">
                         <label>Question</label>
-                        <textarea id="questionText" placeholder="Qui a gagné le Ballon d'Or en 2023?"></textarea>
+                        <textarea id="questionText" placeholder="Qui a...?"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -621,59 +543,36 @@
                     <div class="form-group">
                         <label>Difficulté</label>
                         <div class="difficulty-options">
-                            <label>
-                                <input type="radio" name="difficulty" value="easy"> 🟢 Facile
-                            </label>
-                            <label>
-                                <input type="radio" name="difficulty" value="medium" checked> 🟡 Moyen
-                            </label>
-                            <label>
-                                <input type="radio" name="difficulty" value="hard"> 🔴 Difficile
-                            </label>
+                            <label><input type="radio" name="difficulty" value="easy"> 🟢 Facile</label>
+                            <label><input type="radio" name="difficulty" value="medium" checked> 🟡 Moyen</label>
+                            <label><input type="radio" name="difficulty" value="hard"> 🔴 Difficile</label>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Réponses</label>
                         <div class="answer-group">
-                            <label>
-                                <input type="radio" name="correctAnswer" value="0"> 
-                                <input type="text" id="answer0" placeholder="Réponse A" style="margin: 0; width: calc(100% - 30px);">
-                            </label>
+                            <label><input type="radio" name="correctAnswer" value="0"> <input type="text" id="answer0" placeholder="Réponse A" style="margin: 0; width: calc(100% - 30px);"></label>
                         </div>
                         <div class="answer-group">
-                            <label>
-                                <input type="radio" name="correctAnswer" value="1">
-                                <input type="text" id="answer1" placeholder="Réponse B" style="margin: 0; width: calc(100% - 30px);">
-                            </label>
+                            <label><input type="radio" name="correctAnswer" value="1"><input type="text" id="answer1" placeholder="Réponse B" style="margin: 0; width: calc(100% - 30px);"></label>
                         </div>
                         <div class="answer-group">
-                            <label>
-                                <input type="radio" name="correctAnswer" value="2">
-                                <input type="text" id="answer2" placeholder="Réponse C" style="margin: 0; width: calc(100% - 30px);">
-                            </label>
+                            <label><input type="radio" name="correctAnswer" value="2"><input type="text" id="answer2" placeholder="Réponse C" style="margin: 0; width: calc(100% - 30px);"></label>
                         </div>
                         <div class="answer-group">
-                            <label>
-                                <input type="radio" name="correctAnswer" value="3">
-                                <input type="text" id="answer3" placeholder="Réponse D" style="margin: 0; width: calc(100% - 30px);">
-                            </label>
+                            <label><input type="radio" name="correctAnswer" value="3"><input type="text" id="answer3" placeholder="Réponse D" style="margin: 0; width: calc(100% - 30px);"></label>
                         </div>
                     </div>
 
-                    <button class="btn btn-primary" onclick="addQuestion()" style="width: 100%; margin-top: 20px;">
-                        ✨ Ajouter la question
-                    </button>
+                    <button class="btn btn-primary" onclick="addQuestion()" style="width: 100%; margin-top: 20px;">✨ Ajouter</button>
                 </div>
 
-                <!-- STATS & EXPORT -->
                 <div class="section">
                     <h2>📊 Statistiques</h2>
-
                     <div class="tabs">
                         <button class="tab-btn active" onclick="switchTab('stats')">Catégories</button>
                         <button class="tab-btn" onclick="switchTab('export')">Export</button>
-                        <button class="tab-btn" onclick="switchTab('settings')">Paramètres</button>
                     </div>
 
                     <div id="stats" class="tab-content active">
@@ -681,55 +580,24 @@
                     </div>
 
                     <div id="export" class="tab-content">
-                        <p style="margin-bottom: 15px; color: var(--text-secondary);">
-                            Exporte toutes tes questions en JSON pour backup ou import.
-                        </p>
-                        <button class="btn btn-secondary export-btn" onclick="exportQuestions()">
-                            📥 Exporter en JSON
-                        </button>
-                        <button class="btn btn-secondary export-btn" onclick="document.getElementById('importFile').click()">
-                            📤 Importer depuis JSON
-                        </button>
-                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importQuestions(event)">
-                    </div>
-
-                    <div id="settings" class="tab-content">
-                        <div class="form-group">
-                            <label>Questions par jour</label>
-                            <input type="number" id="questionsPerDay" value="5" min="1" max="20">
-                        </div>
-                        <div class="form-group">
-                            <label>Temps minimum pour répondre (ms)</label>
-                            <input type="number" id="minTime" value="500" min="100">
-                            <p style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
-                                Réponses plus rapides = points zéro (anti-triche)
-                            </p>
-                        </div>
-                        <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%;">
-                            💾 Sauvegarder
-                        </button>
+                        <button class="btn btn-secondary" onclick="exportQuestions()" style="width: 100%; margin-top: 10px;">📥 Exporter JSON</button>
                     </div>
                 </div>
             </div>
 
-            <!-- QUESTIONS LIST -->
-            <div class="section" style="margin-bottom: 40px;">
-                <h2>📝 Toutes les questions</h2>
+            <div class="section">
+                <h2>📝 Questions</h2>
                 <table class="questions-table">
                     <thead>
                         <tr>
-                            <th style="width: 50%;">Question</th>
+                            <th style="width: 60%;">Question</th>
                             <th>Catégorie</th>
                             <th>Difficulté</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="questionsBody">
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: var(--text-secondary);">
-                                Aucune question pour l'instant...
-                            </td>
-                        </tr>
+                        <tr><td colspan="4" style="text-align: center;">Aucune question...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -740,13 +608,11 @@
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeEditModal()">&times;</span>
-            <h2 style="margin-bottom: 20px;">✏️ Éditer Question</h2>
-
+            <h2 style="margin-bottom: 20px;">✏️ Éditer</h2>
             <div class="form-group">
                 <label>Question</label>
                 <textarea id="editQuestionText"></textarea>
             </div>
-
             <div class="form-group">
                 <label>Catégorie</label>
                 <select id="editCategory">
@@ -758,64 +624,34 @@
                     <option value="Musique">🎵 Musique</option>
                 </select>
             </div>
-
-            <div class="form-group">
-                <label>Difficulté</label>
-                <div class="difficulty-options">
-                    <label>
-                        <input type="radio" name="editDifficulty" value="easy"> 🟢 Facile
-                    </label>
-                    <label>
-                        <input type="radio" name="editDifficulty" value="medium"> 🟡 Moyen
-                    </label>
-                    <label>
-                        <input type="radio" name="editDifficulty" value="hard"> 🔴 Difficile
-                    </label>
-                </div>
-            </div>
-
             <div class="form-group">
                 <label>Réponses</label>
                 <div class="answer-group">
-                    <label>
-                        <input type="radio" name="editCorrectAnswer" value="0">
-                        <input type="text" id="editAnswer0" style="margin: 0; width: calc(100% - 30px);">
-                    </label>
+                    <label><input type="radio" name="editCorrectAnswer" value="0"><input type="text" id="editAnswer0" style="margin: 0; width: calc(100% - 30px);"></label>
                 </div>
                 <div class="answer-group">
-                    <label>
-                        <input type="radio" name="editCorrectAnswer" value="1">
-                        <input type="text" id="editAnswer1" style="margin: 0; width: calc(100% - 30px);">
-                    </label>
+                    <label><input type="radio" name="editCorrectAnswer" value="1"><input type="text" id="editAnswer1" style="margin: 0; width: calc(100% - 30px);"></label>
                 </div>
                 <div class="answer-group">
-                    <label>
-                        <input type="radio" name="editCorrectAnswer" value="2">
-                        <input type="text" id="editAnswer2" style="margin: 0; width: calc(100% - 30px);">
-                    </label>
+                    <label><input type="radio" name="editCorrectAnswer" value="2"><input type="text" id="editAnswer2" style="margin: 0; width: calc(100% - 30px);"></label>
                 </div>
                 <div class="answer-group">
-                    <label>
-                        <input type="radio" name="editCorrectAnswer" value="3">
-                        <input type="text" id="editAnswer3" style="margin: 0; width: calc(100% - 30px);">
-                    </label>
+                    <label><input type="radio" name="editCorrectAnswer" value="3"><input type="text" id="editAnswer3" style="margin: 0; width: calc(100% - 30px);"></label>
                 </div>
             </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="saveEditQuestion()">💾 Sauvegarder</button>
-                <button class="btn btn-danger" onclick="deleteQuestion()">🗑️ Supprimer</button>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveEditQuestion()" style="margin-right: 10px;">💾 Sauvegarder</button>
+                <button class="btn btn-danger" onclick="deleteQuestion()" style="margin-right: 10px;">🗑️ Supprimer</button>
                 <button class="btn btn-secondary" onclick="closeEditModal()">Annuler</button>
             </div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
 
     <script>
-        // ========== FIREBASE SETUP ==========
         const firebaseConfig = {
   apiKey: "AIzaSyDR7-ejjHR34AB59j6U0RW8OcpEQd-hfkY",
   authDomain: "quiz-a-day.firebaseapp.com",
@@ -826,30 +662,17 @@
   measurementId: "G-3G82WC3QLM"
 };
 
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        let auth, db;
-        let firebaseReady = false;
+        document.getElementById('firebaseStatus').innerHTML = '✅ Firebase prêt!';
+        document.getElementById('firebaseStatus').style.color = '#4ECDC4';
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.database();
-            firebaseReady = true;
-            console.log('✅ Firebase initialized successfully');
-            document.getElementById('firebaseStatus').innerHTML = '✅ Firebase connecté!';
-            document.getElementById('firebaseStatus').style.color = '#4ECDC4';
-        } catch (error) {
-            console.error('❌ Firebase error:', error);
-            document.getElementById('firebaseStatus').innerHTML = '❌ Erreur Firebase: ' + error.message;
-            document.getElementById('firebaseStatus').style.color = '#FF6B6B';
-        }
-
-        // ========== STATE ==========
         let currentUser = null;
         let currentEditId = null;
         let allQuestions = [];
 
-        // ========== STARS BACKGROUND ==========
         function createStars() {
             const bg = document.getElementById('starsBg');
             for (let i = 0; i < 50; i++) {
@@ -864,13 +687,7 @@
             }
         }
 
-        // ========== AUTH ==========
         function handleAuth() {
-            if (!firebaseReady) {
-                alert('Firebase n\'est pas configuré correctement. Vérifie tes identifiants!');
-                return;
-            }
-
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const isSignup = document.getElementById('isSignup').checked;
@@ -882,30 +699,17 @@
 
             if (isSignup) {
                 auth.createUserWithEmailAndPassword(email, password)
-                    .then(result => {
-                        currentUser = result.user;
-                        showMainApp();
-                    })
-                    .catch(error => {
-                        console.error('Signup error:', error);
-                        alert('Erreur signup: ' + error.message);
-                    });
+                    .then(() => { currentUser = auth.currentUser; showMainApp(); })
+                    .catch(e => alert('Erreur: ' + e.message));
             } else {
                 auth.signInWithEmailAndPassword(email, password)
-                    .then(result => {
-                        currentUser = result.user;
-                        showMainApp();
-                    })
-                    .catch(error => {
-                        console.error('Login error:', error);
-                        alert('Erreur login: ' + error.message);
-                    });
+                    .then(() => { currentUser = auth.currentUser; showMainApp(); })
+                    .catch(e => alert('Erreur: ' + e.message));
             }
         }
 
         function logout() {
             auth.signOut().then(() => {
-                currentUser = null;
                 document.getElementById('loginScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
             });
@@ -918,13 +722,11 @@
             loadStats();
         }
 
-        // ========== QUESTIONS CRUD ==========
-        async function addQuestion() {
+        function addQuestion() {
             const text = document.getElementById('questionText').value;
             const category = document.getElementById('questionCategory').value;
             const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value;
             const correctAnswer = parseInt(document.querySelector('input[name="correctAnswer"]:checked')?.value);
-            
             const answers = [
                 document.getElementById('answer0').value,
                 document.getElementById('answer1').value,
@@ -933,48 +735,32 @@
             ];
 
             if (!text || !category || !difficulty || answers.some(a => !a) || correctAnswer === undefined) {
-                alert('Tous les champs sont requis!');
+                alert('Tous les champs requis!');
                 return;
             }
 
-            const question = {
-                text,
-                category,
-                difficulty,
-                answers,
-                correctAnswer,
-                createdAt: new Date().toISOString()
-            };
-
-            db.ref('questions').push(question).then(() => {
-                document.getElementById('questionText').value = '';
-                document.getElementById('answer0').value = '';
-                document.getElementById('answer1').value = '';
-                document.getElementById('answer2').value = '';
-                document.getElementById('answer3').value = '';
-                document.querySelector('input[name="difficulty"]').checked = false;
-                document.querySelector('input[name="correctAnswer"]').checked = false;
-
-                showSuccess('✓ Question ajoutée avec succès!');
-                loadQuestions();
-                loadStats();
-            }).catch(error => alert('Erreur: ' + error.message));
+            db.ref('questions').push({text, category, difficulty, answers, correctAnswer, createdAt: new Date().toISOString()})
+                .then(() => {
+                    document.getElementById('questionText').value = '';
+                    ['answer0','answer1','answer2','answer3'].forEach(id => document.getElementById(id).value = '');
+                    document.querySelector('input[name="difficulty"]').checked = false;
+                    showSuccess('✓ Ajoutée!');
+                    loadQuestions();
+                    loadStats();
+                });
         }
 
         function openEditModal(id) {
             currentEditId = id;
             const q = allQuestions.find(x => x.id === id);
             if (!q) return;
-
             document.getElementById('editQuestionText').value = q.text;
             document.getElementById('editCategory').value = q.category;
-            document.querySelector(`input[name="editDifficulty"][value="${q.difficulty}"]`).checked = true;
             document.getElementById('editAnswer0').value = q.answers[0];
             document.getElementById('editAnswer1').value = q.answers[1];
             document.getElementById('editAnswer2').value = q.answers[2];
             document.getElementById('editAnswer3').value = q.answers[3];
             document.querySelector(`input[name="editCorrectAnswer"][value="${q.correctAnswer}"]`).checked = true;
-
             document.getElementById('editModal').classList.add('active');
         }
 
@@ -985,9 +771,7 @@
         function saveEditQuestion() {
             const text = document.getElementById('editQuestionText').value;
             const category = document.getElementById('editCategory').value;
-            const difficulty = document.querySelector('input[name="editDifficulty"]:checked')?.value;
             const correctAnswer = parseInt(document.querySelector('input[name="editCorrectAnswer"]:checked')?.value);
-            
             const answers = [
                 document.getElementById('editAnswer0').value,
                 document.getElementById('editAnswer1').value,
@@ -995,36 +779,18 @@
                 document.getElementById('editAnswer3').value
             ];
 
-            if (!text || !category || !difficulty || answers.some(a => !a) || correctAnswer === undefined) {
-                alert('Tous les champs sont requis!');
-                return;
-            }
-
-            db.ref(`questions/${currentEditId}`).update({
-                text,
-                category,
-                difficulty,
-                answers,
-                correctAnswer,
-                updatedAt: new Date().toISOString()
-            }).then(() => {
-                closeEditModal();
-                loadQuestions();
-                loadStats();
-            }).catch(error => alert('Erreur: ' + error.message));
+            db.ref(`questions/${currentEditId}`).update({text, category, answers, correctAnswer})
+                .then(() => { closeEditModal(); loadQuestions(); });
         }
 
         function deleteQuestion() {
-            if (!confirm('Êtes-vous sûr? Cette action est irréversible.')) return;
-
+            if (!confirm('Supprimer?')) return;
             db.ref(`questions/${currentEditId}`).remove().then(() => {
                 closeEditModal();
                 loadQuestions();
-                loadStats();
-            }).catch(error => alert('Erreur: ' + error.message));
+            });
         }
 
-        // ========== DATA LOADING ==========
         function loadQuestions() {
             db.ref('questions').on('value', snapshot => {
                 allQuestions = [];
@@ -1034,25 +800,20 @@
                 snapshot.forEach(child => {
                     const q = child.val();
                     allQuestions.push({id: child.key, ...q});
-                    
                     const catClass = `category-${q.category.toLowerCase().replace(/\s+/g, '')}`;
-                    const diffClass = `difficulty-${q.difficulty}`;
                     const diffEmoji = q.difficulty === 'easy' ? '🟢' : q.difficulty === 'medium' ? '🟡' : '🔴';
-
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${q.text}</td>
                         <td><span class="category-badge ${catClass}">${q.category}</span></td>
-                        <td><span class="${diffClass}">${diffEmoji} ${q.difficulty}</span></td>
-                        <td>
-                            <button class="btn btn-secondary btn-small" onclick="openEditModal('${child.key}')">✏️ Éditer</button>
-                        </td>
+                        <td>${diffEmoji} ${q.difficulty}</td>
+                        <td><button class="btn btn-secondary btn-small" onclick="openEditModal('${child.key}')">✏️</button></td>
                     `;
                     tbody.appendChild(row);
                 });
 
                 if (allQuestions.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">Aucune question pour l\'instant...</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Aucune question</td></tr>';
                 }
             });
         }
@@ -1060,7 +821,6 @@
         function loadStats() {
             db.ref('questions').once('value', snapshot => {
                 document.getElementById('totalQuestions').textContent = snapshot.numChildren();
-
                 const stats = {};
                 snapshot.forEach(child => {
                     const cat = child.val().category;
@@ -1072,52 +832,22 @@
                 Object.entries(stats).forEach(([cat, count]) => {
                     const card = document.createElement('div');
                     card.className = 'stat-card accent-1';
-                    card.innerHTML = `
-                        <div class="stat-number">${count}</div>
-                        <div class="stat-label">${cat}</div>
-                    `;
+                    card.innerHTML = `<div class="stat-number">${count}</div><div class="stat-label">${cat}</div>`;
                     statsDiv.appendChild(card);
                 });
             });
         }
 
-        // ========== EXPORT/IMPORT ==========
         function exportQuestions() {
-            const data = {
-                exported: new Date().toISOString(),
-                questions: allQuestions
-            };
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], {type: 'application/json'});
+            const data = {exported: new Date().toISOString(), questions: allQuestions};
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `quiz-questions-${new Date().getTime()}.json`;
+            a.download = `quiz-questions-${Date.now()}.json`;
             a.click();
         }
 
-        function importQuestions(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    data.questions.forEach(q => {
-                        db.ref('questions').push(q);
-                    });
-                    alert('✓ Questions importées!');
-                    loadQuestions();
-                    loadStats();
-                } catch (err) {
-                    alert('Erreur parsing JSON: ' + err.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        // ========== UI HELPERS ==========
         function showSuccess(msg) {
             const el = document.getElementById('successMessage');
             el.textContent = msg;
@@ -1128,24 +858,10 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            
             event.target.classList.add('active');
             document.getElementById(tab).classList.add('active');
         }
 
-        function saveSettings() {
-            const questionsPerDay = document.getElementById('questionsPerDay').value;
-            const minTime = document.getElementById('minTime').value;
-
-            db.ref('settings').set({
-                questionsPerDay: parseInt(questionsPerDay),
-                minTime: parseInt(minTime)
-            }).then(() => {
-                showSuccess('⚙️ Paramètres sauvegardés!');
-            });
-        }
-
-        // ========== INIT ==========
         createStars();
         auth.onAuthStateChanged(user => {
             if (user) {
