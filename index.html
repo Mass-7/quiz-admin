@@ -654,7 +654,8 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprc25zeHhlZHl6ZXd4eWx1c3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwODU5MjYsImV4cCI6MjA5MTY2MTkyNn0.ujKCZQ70BKiSEwkOPMvktUsKhGC87-WVi0xFWYotG6E';
 
         const { createClient } = window.supabase;
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabase;
+        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         document.getElementById('firebaseStatus').innerHTML = '✅ Supabase prêt!';
         document.getElementById('firebaseStatus').style.color = '#4ECDC4';
