@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Quiz-a-Day Admin Panel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B9D;
+            --secondary: #C44569;
+            --accent-1: #4ECDC4;
+            --accent-2: #FFE66D;
+            --accent-3: #95E1D3;
+            --accent-4: #F38181;
+            --accent-5: #AA96DA;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #0f0f1e;
+            --card-bg: #16213e;
+            --text-light: #eaeaea;
+            --text-secondary: #b0b0b0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .stars-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary), var(--accent-2), var(--accent-1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 107, 157, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        .stat-card.accent-1 {
+            border-color: var(--accent-1);
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .stat-card.accent-2 {
+            border-color: var(--accent-2);
+            background: rgba(255, 230, 109, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-card.accent-1 .stat-number {
+            color: var(--accent-1);
+        }
+
+        .stat-card.accent-2 .stat-number {
+            color: var(--accent-2);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border: 2px solid rgba(255, 107, 157, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--accent-1);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--accent-2);
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(78, 205, 196, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-light);
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .answer-group {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .answer-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .answer-group input[type="radio"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--accent-1), var(--accent-3));
+            color: var(--darker-bg);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, var(--accent-4), #FF6B6B);
+            color: white;
+            box-shadow: 0 4px 15px rgba(243, 129, 129, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 129, 129, 0.5);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+
+        .questions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .questions-table th {
+            background: rgba(78, 205, 196, 0.2);
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            color: var(--accent-1);
+            border-bottom: 2px solid var(--accent-1);
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        .questions-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 107, 157, 0.1);
+        }
+
+        .questions-table tr:hover {
+            background: rgba(78, 205, 196, 0.05);
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .category-sport { background: rgba(255, 107, 157, 0.3); color: var(--primary); }
+        .category-histoire { background: rgba(170, 150, 218, 0.3); color: var(--accent-5); }
+        .category-sciences { background: rgba(243, 129, 129, 0.3); color: var(--accent-4); }
+        .category-pop { background: rgba(255, 230, 109, 0.3); color: var(--accent-2); }
+        .category-jeux { background: rgba(78, 205, 196, 0.3); color: var(--accent-1); }
+        .category-musique { background: rgba(149, 225, 211, 0.3); color: var(--accent-3); }
+
+        .difficulty-easy { color: #4ECDC4; }
+        .difficulty-medium { color: #FFE66D; }
+        .difficulty-hard { color: #FF6B9D; }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(78, 205, 196, 0.2);
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-1);
+            border-bottom-color: var(--accent-1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 2px solid var(--accent-1);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--primary);
+        }
+
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 50px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-box h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            margin-top: 20px;
+        }
+
+        .success-message {
+            background: rgba(78, 205, 196, 0.2);
+            border-left: 4px solid var(--accent-1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: var(--accent-1);
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .category-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .difficulty-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .difficulty-options label {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .questions-table {
+                font-size: 0.9em;
+            }
+
+            .questions-table td, .questions-table th {
+                padding: 10px;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(78, 205, 196, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-1);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars-bg" id="starsBg"></div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h1>🎮 Quiz-a-Day</h1>
+            <p class="subtitle" style="margin-bottom: 30px;">Admin Panel Setup</p>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="admin@quiz.com">
+            </div>
+
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+            </div>
+
+            <div class="form-group">
+                <label style="color: var(--text-secondary); font-size: 0.8em;">
+                    <input type="checkbox" id="isSignup"> Créer un compte (première visite)
+                </label>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; font-size: 1.1em; padding: 15px;" onclick="handleAuth()">
+                Se connecter
+            </button>
+
+            <p style="margin-top: 20px; font-size: 0.9em; color: var(--text-secondary); text-align: center;">
+                ⚠️ Configure d'abord Firebase (voir console)
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" style="display: none;">
+        <div class="container">
+            <header>
+                <h1>🎮 Quiz-a-Day Admin</h1>
+                <p class="subtitle">Gère tes questions, contrôle le jeu</p>
+                <button class="btn btn-secondary btn-small" onclick="logout()" style="margin-top: 15px;">
+                    Logout
+                </button>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalQuestions">0</div>
+                    <div class="stat-label">Questions totales</div>
+                </div>
+                <div class="stat-card accent-1">
+                    <div class="stat-number" id="todayQuestions">0</div>
+                    <div class="stat-label">Questions aujourd'hui</div>
+                </div>
+                <div class="stat-card accent-2">
+                    <div class="stat-number" id="activeUsers">0</div>
+                    <div class="stat-label">Joueurs actifs</div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <!-- ADD QUESTION SECTION -->
+                <div class="section">
+                    <h2>➕ Ajouter Question</h2>
+                    <div class="success-message" id="successMessage">✓ Question ajoutée avec succès!</div>
+
+                    <div class="form-group">
+                        <label>Question</label>
+                        <textarea id="questionText" placeholder="Qui a gagné le Ballon d'Or en 2023?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Catégorie</label>
+                        <select id="questionCategory">
+                            <option value="Sport">⚽ Sport</option>
+                            <option value="Histoire">📚 Histoire</option>
+                            <option value="Sciences">🔬 Sciences</option>
+                            <option value="Pop Culture">🎬 Pop Culture</option>
+                            <option value="Jeu vidéo">🎮 Jeu vidéo</option>
+                            <option value="Musique">🎵 Musique</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Difficulté</label>
+                        <div class="difficulty-options">
+                            <label>
+                                <input type="radio" name="difficulty" value="easy"> 🟢 Facile
+                            </label>
+                            <label>
+                                <input type="radio" name="difficulty" value="medium" checked> 🟡 Moyen
+                            </label>
+                            <label>
+                                <input type="radio" name="difficulty" value="hard"> 🔴 Difficile
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Réponses</label>
+                        <div class="answer-group">
+                            <label>
+                                <input type="radio" name="correctAnswer" value="0"> 
+                                <input type="text" id="answer0" placeholder="Réponse A" style="margin: 0; width: calc(100% - 30px);">
+                            </label>
+                        </div>
+                        <div class="answer-group">
+                            <label>
+                                <input type="radio" name="correctAnswer" value="1">
+                                <input type="text" id="answer1" placeholder="Réponse B" style="margin: 0; width: calc(100% - 30px);">
+                            </label>
+                        </div>
+                        <div class="answer-group">
+                            <label>
+                                <input type="radio" name="correctAnswer" value="2">
+                                <input type="text" id="answer2" placeholder="Réponse C" style="margin: 0; width: calc(100% - 30px);">
+                            </label>
+                        </div>
+                        <div class="answer-group">
+                            <label>
+                                <input type="radio" name="correctAnswer" value="3">
+                                <input type="text" id="answer3" placeholder="Réponse D" style="margin: 0; width: calc(100% - 30px);">
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="addQuestion()" style="width: 100%; margin-top: 20px;">
+                        ✨ Ajouter la question
+                    </button>
+                </div>
+
+                <!-- STATS & EXPORT -->
+                <div class="section">
+                    <h2>📊 Statistiques</h2>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchTab('stats')">Catégories</button>
+                        <button class="tab-btn" onclick="switchTab('export')">Export</button>
+                        <button class="tab-btn" onclick="switchTab('settings')">Paramètres</button>
+                    </div>
+
+                    <div id="stats" class="tab-content active">
+                        <div class="category-stats" id="categoryStats"></div>
+                    </div>
+
+                    <div id="export" class="tab-content">
+                        <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                            Exporte toutes tes questions en JSON pour backup ou import.
+                        </p>
+                        <button class="btn btn-secondary export-btn" onclick="exportQuestions()">
+                            📥 Exporter en JSON
+                        </button>
+                        <button class="btn btn-secondary export-btn" onclick="document.getElementById('importFile').click()">
+                            📤 Importer depuis JSON
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importQuestions(event)">
+                    </div>
+
+                    <div id="settings" class="tab-content">
+                        <div class="form-group">
+                            <label>Questions par jour</label>
+                            <input type="number" id="questionsPerDay" value="5" min="1" max="20">
+                        </div>
+                        <div class="form-group">
+                            <label>Temps minimum pour répondre (ms)</label>
+                            <input type="number" id="minTime" value="500" min="100">
+                            <p style="font-size: 0.8em; color: var(--text-secondary); margin-top: 5px;">
+                                Réponses plus rapides = points zéro (anti-triche)
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%;">
+                            💾 Sauvegarder
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTIONS LIST -->
+            <div class="section" style="margin-bottom: 40px;">
+                <h2>📝 Toutes les questions</h2>
+                <table class="questions-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">Question</th>
+                            <th>Catégorie</th>
+                            <th>Difficulté</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionsBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary);">
+                                Aucune question pour l'instant...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            <h2 style="margin-bottom: 20px;">✏️ Éditer Question</h2>
+
+            <div class="form-group">
+                <label>Question</label>
+                <textarea id="editQuestionText"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Catégorie</label>
+                <select id="editCategory">
+                    <option value="Sport">⚽ Sport</option>
+                    <option value="Histoire">📚 Histoire</option>
+                    <option value="Sciences">🔬 Sciences</option>
+                    <option value="Pop Culture">🎬 Pop Culture</option>
+                    <option value="Jeu vidéo">🎮 Jeu vidéo</option>
+                    <option value="Musique">🎵 Musique</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Difficulté</label>
+                <div class="difficulty-options">
+                    <label>
+                        <input type="radio" name="editDifficulty" value="easy"> 🟢 Facile
+                    </label>
+                    <label>
+                        <input type="radio" name="editDifficulty" value="medium"> 🟡 Moyen
+                    </label>
+                    <label>
+                        <input type="radio" name="editDifficulty" value="hard"> 🔴 Difficile
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Réponses</label>
+                <div class="answer-group">
+                    <label>
+                        <input type="radio" name="editCorrectAnswer" value="0">
+                        <input type="text" id="editAnswer0" style="margin: 0; width: calc(100% - 30px);">
+                    </label>
+                </div>
+                <div class="answer-group">
+                    <label>
+                        <input type="radio" name="editCorrectAnswer" value="1">
+                        <input type="text" id="editAnswer1" style="margin: 0; width: calc(100% - 30px);">
+                    </label>
+                </div>
+                <div class="answer-group">
+                    <label>
+                        <input type="radio" name="editCorrectAnswer" value="2">
+                        <input type="text" id="editAnswer2" style="margin: 0; width: calc(100% - 30px);">
+                    </label>
+                </div>
+                <div class="answer-group">
+                    <label>
+                        <input type="radio" name="editCorrectAnswer" value="3">
+                        <input type="text" id="editAnswer3" style="margin: 0; width: calc(100% - 30px);">
+                    </label>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="saveEditQuestion()">💾 Sauvegarder</button>
+                <button class="btn btn-danger" onclick="deleteQuestion()">🗑️ Supprimer</button>
+                <button class="btn btn-secondary" onclick="closeEditModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== FIREBASE SETUP ==========
+        // ⚠️ REMPLACE CES VALEURS AVEC TES DONNÉES FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyDR7-ejjHR34AB59j6U0RW8OcpEQd-hfkY",
+  authDomain: "quiz-a-day.firebaseapp.com",
+  projectId: "quiz-a-day",
+  storageBucket: "quiz-a-day.firebasestorage.app",
+  messagingSenderId: "43179997556",
+  appId: "1:43179997556:web:8941316211be6259b8d421",
+  measurementId: "G-3G82WC3QLM"
+};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // ========== STATE ==========
+        let currentUser = null;
+        let currentEditId = null;
+        let allQuestions = [];
+
+        // ========== STARS BACKGROUND ==========
+        function createStars() {
+            const bg = document.getElementById('starsBg');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                bg.appendChild(star);
+            }
+        }
+
+        // ========== AUTH ==========
+        function handleAuth() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const isSignup = document.getElementById('isSignup').checked;
+
+            if (!email || !password) {
+                alert('Email et mot de passe requis!');
+                return;
+            }
+
+            if (isSignup) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(result => {
+                        currentUser = result.user;
+                        showMainApp();
+                    })
+                    .catch(error => alert('Erreur signup: ' + error.message));
+            } else {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(result => {
+                        currentUser = result.user;
+                        showMainApp();
+                    })
+                    .catch(error => alert('Erreur login: ' + error.message));
+            }
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                currentUser = null;
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+            });
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadQuestions();
+            loadStats();
+        }
+
+        // ========== QUESTIONS CRUD ==========
+        async function addQuestion() {
+            const text = document.getElementById('questionText').value;
+            const category = document.getElementById('questionCategory').value;
+            const difficulty = document.querySelector('input[name="difficulty"]:checked')?.value;
+            const correctAnswer = parseInt(document.querySelector('input[name="correctAnswer"]:checked')?.value);
+            
+            const answers = [
+                document.getElementById('answer0').value,
+                document.getElementById('answer1').value,
+                document.getElementById('answer2').value,
+                document.getElementById('answer3').value
+            ];
+
+            if (!text || !category || !difficulty || answers.some(a => !a) || correctAnswer === undefined) {
+                alert('Tous les champs sont requis!');
+                return;
+            }
+
+            const question = {
+                text,
+                category,
+                difficulty,
+                answers,
+                correctAnswer,
+                createdAt: new Date().toISOString()
+            };
+
+            db.ref('questions').push(question).then(() => {
+                document.getElementById('questionText').value = '';
+                document.getElementById('answer0').value = '';
+                document.getElementById('answer1').value = '';
+                document.getElementById('answer2').value = '';
+                document.getElementById('answer3').value = '';
+                document.querySelector('input[name="difficulty"]').checked = false;
+                document.querySelector('input[name="correctAnswer"]').checked = false;
+
+                showSuccess('✓ Question ajoutée avec succès!');
+                loadQuestions();
+                loadStats();
+            }).catch(error => alert('Erreur: ' + error.message));
+        }
+
+        function openEditModal(id) {
+            currentEditId = id;
+            const q = allQuestions.find(x => x.id === id);
+            if (!q) return;
+
+            document.getElementById('editQuestionText').value = q.text;
+            document.getElementById('editCategory').value = q.category;
+            document.querySelector(`input[name="editDifficulty"][value="${q.difficulty}"]`).checked = true;
+            document.getElementById('editAnswer0').value = q.answers[0];
+            document.getElementById('editAnswer1').value = q.answers[1];
+            document.getElementById('editAnswer2').value = q.answers[2];
+            document.getElementById('editAnswer3').value = q.answers[3];
+            document.querySelector(`input[name="editCorrectAnswer"][value="${q.correctAnswer}"]`).checked = true;
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        function saveEditQuestion() {
+            const text = document.getElementById('editQuestionText').value;
+            const category = document.getElementById('editCategory').value;
+            const difficulty = document.querySelector('input[name="editDifficulty"]:checked')?.value;
+            const correctAnswer = parseInt(document.querySelector('input[name="editCorrectAnswer"]:checked')?.value);
+            
+            const answers = [
+                document.getElementById('editAnswer0').value,
+                document.getElementById('editAnswer1').value,
+                document.getElementById('editAnswer2').value,
+                document.getElementById('editAnswer3').value
+            ];
+
+            if (!text || !category || !difficulty || answers.some(a => !a) || correctAnswer === undefined) {
+                alert('Tous les champs sont requis!');
+                return;
+            }
+
+            db.ref(`questions/${currentEditId}`).update({
+                text,
+                category,
+                difficulty,
+                answers,
+                correctAnswer,
+                updatedAt: new Date().toISOString()
+            }).then(() => {
+                closeEditModal();
+                loadQuestions();
+                loadStats();
+            }).catch(error => alert('Erreur: ' + error.message));
+        }
+
+        function deleteQuestion() {
+            if (!confirm('Êtes-vous sûr? Cette action est irréversible.')) return;
+
+            db.ref(`questions/${currentEditId}`).remove().then(() => {
+                closeEditModal();
+                loadQuestions();
+                loadStats();
+            }).catch(error => alert('Erreur: ' + error.message));
+        }
+
+        // ========== DATA LOADING ==========
+        function loadQuestions() {
+            db.ref('questions').on('value', snapshot => {
+                allQuestions = [];
+                const tbody = document.getElementById('questionsBody');
+                tbody.innerHTML = '';
+
+                snapshot.forEach(child => {
+                    const q = child.val();
+                    allQuestions.push({id: child.key, ...q});
+                    
+                    const catClass = `category-${q.category.toLowerCase().replace(/\s+/g, '')}`;
+                    const diffClass = `difficulty-${q.difficulty}`;
+                    const diffEmoji = q.difficulty === 'easy' ? '🟢' : q.difficulty === 'medium' ? '🟡' : '🔴';
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${q.text}</td>
+                        <td><span class="category-badge ${catClass}">${q.category}</span></td>
+                        <td><span class="${diffClass}">${diffEmoji} ${q.difficulty}</span></td>
+                        <td>
+                            <button class="btn btn-secondary btn-small" onclick="openEditModal('${child.key}')">✏️ Éditer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                if (allQuestions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">Aucune question pour l\'instant...</td></tr>';
+                }
+            });
+        }
+
+        function loadStats() {
+            db.ref('questions').once('value', snapshot => {
+                document.getElementById('totalQuestions').textContent = snapshot.numChildren();
+
+                const stats = {};
+                snapshot.forEach(child => {
+                    const cat = child.val().category;
+                    stats[cat] = (stats[cat] || 0) + 1;
+                });
+
+                const statsDiv = document.getElementById('categoryStats');
+                statsDiv.innerHTML = '';
+                Object.entries(stats).forEach(([cat, count]) => {
+                    const card = document.createElement('div');
+                    card.className = 'stat-card accent-1';
+                    card.innerHTML = `
+                        <div class="stat-number">${count}</div>
+                        <div class="stat-label">${cat}</div>
+                    `;
+                    statsDiv.appendChild(card);
+                });
+            });
+        }
+
+        // ========== EXPORT/IMPORT ==========
+        function exportQuestions() {
+            const data = {
+                exported: new Date().toISOString(),
+                questions: allQuestions
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quiz-questions-${new Date().getTime()}.json`;
+            a.click();
+        }
+
+        function importQuestions(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    data.questions.forEach(q => {
+                        db.ref('questions').push(q);
+                    });
+                    alert('✓ Questions importées!');
+                    loadQuestions();
+                    loadStats();
+                } catch (err) {
+                    alert('Erreur parsing JSON: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ========== UI HELPERS ==========
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function saveSettings() {
+            const questionsPerDay = document.getElementById('questionsPerDay').value;
+            const minTime = document.getElementById('minTime').value;
+
+            db.ref('settings').set({
+                questionsPerDay: parseInt(questionsPerDay),
+                minTime: parseInt(minTime)
+            }).then(() => {
+                showSuccess('⚙️ Paramètres sauvegardés!');
+            });
+        }
+
+        // ========== INIT ==========
+        createStars();
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                showMainApp();
+            }
+        });
+    </script>
+</body>
+</html>
